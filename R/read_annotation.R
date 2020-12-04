@@ -99,6 +99,10 @@ read_annotation <- function(path, verbose = TRUE){
       colortable$code[structure] <- colortable$R[structure] + 
         colortable$G[structure]*2^8 + 
         colortable$B[structure]*2^16;
+      colortable$hex[structure] <- grDevices::rgb(colortable$R[structure], 
+                                       colortable$G[structure], 
+                                       colortable$B[structure], 
+                                       maxColorValue = 255)
     } # for i
     
     if(verbose){ 
