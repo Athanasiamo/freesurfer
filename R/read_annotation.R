@@ -123,7 +123,7 @@ read_annotation <- function(path, verbose = TRUE){
   return(
     annotation(
       vertices = vertices,
-      label = label,
+      labels = label,
       colortable = colortable
     )
   )
@@ -202,12 +202,15 @@ annotation <- function(vertices, labels, colortable = NULL){
 #'  res = read_annotation(annot_file)
 #'     
 #'  is_annotation(res)
+#'  is.annotation(res)
 #'  
 #'  is_annotation(annot_file)
+#'  is.annotation(annot_file)
 #' } 
 is.annotation <- function(x) inherits(x, "freesurfer_annotation")
 
 #' @rdname is_annotation
+#' @export
 is_annotation <- is.annotation
 
 #' @export
