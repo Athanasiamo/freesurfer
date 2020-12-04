@@ -25,7 +25,7 @@
 #'     res = read_annotation(annot_file)
 #' } 
 read_annotation <- function(path, verbose = TRUE){
-  
+
   # indicate this is binary
   ff <- file(path, "rb")
   on.exit(close(ff))
@@ -117,8 +117,107 @@ read_annotation <- function(path, verbose = TRUE){
   }
   
   return(
-    list(vertices = vertices,
-         label = label,
-         colortable = colortable)
+    annotation(
+      vertices = vertices,
+      label = label,
+      colortable = colortable
+    )
   )
 }
+
+
+
+#' Make object into class freesurfer_annotation
+#' 
+#' @param x list of three: vertices, labels and colortable
+#'
+#' @export
+#' @examples 
+#' if (have_fs()) {
+#'  bert_dir = file.path(fs_subj_dir(), "bert")
+#'  annot_file = file.path(bert_dir, "label", "lh.aparc.annot")
+#'  res = read_annotation(annot_file)
+#'     
+#'  as_annotation(list(
+#'    vertices = res$vertices,
+#'    labels = res$labels,
+#'    colortable = res$colortable
+#'  ))
+#' } 
+as_annotation <- function(x){
+  stopifnot(class(x) == "list")
+  stopifnot(all(names(x) %in% c("vertices", "labels", "colortable")))
+  structure(
+    x,
+    class = "freesurfer_annotation"
+  )
+}
+
+#' Constructor for freesurfer_annotation-class
+#' 
+#' freesurfer_annotation is a special object
+#' containing the three components of a 
+#' FreeSurfer annotation file: vertices, labels
+#' and the colortable
+#'  
+#' @param vertices vector of vertices
+#' @param labels vector of labels
+#' @param colortable color table
+#'
+#' @export
+#' @examples 
+#' if (have_fs()) {
+#'  bert_dir = file.path(fs_subj_dir(), "bert")
+#'  annot_file = file.path(bert_dir, "label", "lh.aparc.annot")
+#'  res = read_annotation(annot_file)
+#'     
+#'  annotation(
+#'    vertices = res$vertices,
+#'    labels = res$labels,
+#'    colortable = res$colortable
+#'  )
+#' } 
+annotation <- function(vertices, labels, colortable = NULL){
+  x <- list(vertices = vertices,
+            labels = labels,
+            colortable = colortable)
+  as_annotation(x)
+}
+
+#' freesurfer_annotation validation
+#' 
+#' check if object is of class freesurfer_annotation
+#' 
+#' @param x object to check
+#' @export
+#' @rdname is_annotation
+#' @examples 
+#' if (have_fs()) {
+#'  bert_dir = file.path(fs_subj_dir(), "bert")
+#'  annot_file = file.path(bert_dir, "label", "lh.aparc.annot")
+#'  res = read_annotation(annot_file)
+#'     
+#'  is_annotation(res)
+#'  
+#'  is_annotation(annot_file)
+#' } 
+is.annotation <- function(x) inherits(x, "freesurfer_annotation")
+
+#' @rdname is_annotation
+is_annotation <- is.annotation
+
+#' @export
+format.freesurfer_annotation <- function(x, ...){
+  k <- utils::capture.output(utils::str(x))[-1]
+  k <- k[!grepl("attr", k)]
+  
+  c(sprintf("# Freesurfer annotation"),
+    k)
+}
+
+#' @export
+print.freesurfer_annotation <- function(x, ...){
+  cat(format(x), sep="\n")
+  invisible(x)
+}
+
